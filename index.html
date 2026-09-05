@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Teacher Tools</title>
+  <style>
+    :root {
+      --navy-900: #0d2543;
+      --navy-700: #1b3a63;
+      --orange-500: #f2994a;
+      --orange-600: #ea8330;
+      --orange-700: #c9691f;
+      --text-dim: #5b6b82;
+      --border: #dfe6ee;
+      --surface: #ffffff;
+      --bg: #4f6079;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(160deg, var(--bg), #38455a);
+      font-family: 'Segoe UI', Inter, Arial, sans-serif;
+    }
+
+    main {
+      width: min(560px, 92%);
+      margin: 8vh auto 60px;
+    }
+
+    .card {
+      padding: clamp(24px, 5vw, 36px);
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      margin-bottom: 20px;
+    }
+
+    h1 { margin: 0 0 4px; color: var(--navy-900); font-size: 1.6rem; }
+    h2 { margin: 0 0 10px; color: var(--navy-900); font-size: 1.1rem; }
+    p { color: var(--text-dim); line-height: 1.5; }
+
+    .gate-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+    .gate-input:focus { outline: none; border-color: var(--orange-500); }
+
+    .btn {
+      display: inline-block;
+      padding: 11px 20px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(160deg, var(--orange-500), var(--orange-700));
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn.secondary {
+      background: rgba(13, 37, 67, 0.08);
+      color: var(--navy-900);
+    }
+    .btn.disabled {
+      background: rgba(13, 37, 67, 0.08);
+      color: var(--text-dim);
+      cursor: default;
+    }
+
+    .gate-error {
+      min-height: 20px;
+      margin: 12px 0 0;
+      color: #a93b19;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .stat-row { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 4px; }
+    .stat b { display: block; color: var(--navy-900); font-size: 1.5rem; }
+    .stat span { color: var(--text-dim); font-size: 12.5px; }
+
+    .roadmap-list { list-style: none; padding: 0; margin: 0; }
+    .roadmap-list li {
+      display: flex; gap: 10px; align-items: baseline;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+      color: var(--navy-900); font-size: 14.5px;
+    }
+    .roadmap-list li:last-child { border-bottom: none; }
+    .tag {
+      flex: 0 0 auto;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .tag.live { background: #dff3e8; color: #18724a; }
+    .tag.progress { background: #fdecd6; color: var(--orange-700); }
+    .tag.considering { background: #e6ecf5; color: var(--navy-700); }
+
+    #unlockedView { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="card" id="lockedView">
+      <h1>Teacher Tools</h1>
+      <p>Enter the shared password to continue.</p>
+      <input type="password" id="pwInput" class="gate-input" placeholder="Password" autocomplete="off">
+      <div style="margin-top:14px;">
+        <button class="btn" id="unlockButton" type="button">Unlock</button>
+      </div>
+      <p class="gate-error" id="gateError"></p>
+    </div>
+
+    <div id="unlockedView">
+      <div class="card">
+        <h2>Suggest an App</h2>
+        <p>Ideas for a new app or resource? This goes straight into a private form — nothing posted publicly.</p>
+        <a class="btn" id="suggestLink" href="#" target="_blank" rel="noopener">Open the form</a>
+      </div>
+
+      <div class="card" id="bugCard">
+        <h2>Report a Bug</h2>
+        <p id="bugText">Something broken on one of the apps? Let us know here.</p>
+        <a class="btn" id="bugLink" href="#" target="_blank" rel="noopener">Open the form</a>
+      </div>
+
+      <div class="card">
+        <h2>What's Coming</h2>
+        <ul class="roadmap-list" id="roadmapList"></ul>
+      </div>
+
+      <div class="card">
+        <h2>Quick Stats</h2>
+        <div class="stat-row" id="statsRow"></div>
+        <p style="margin-top:14px;">Want to see which apps get opened most? <a href="https://ephskeate.goatcounter.com" target="_blank" rel="noopener">Open the full analytics dashboard</a> (log in with your GoatCounter account).</p>
+      </div>
+
+      <div class="card" id="sheetCard">
+        <h2>View Past Suggestions</h2>
+        <p>See what other teachers have already asked for, so you're not duplicating a request.</p>
+        <a class="btn secondary" id="sheetLink" href="#" target="_blank" rel="noopener">Open the sheet</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ======================================================================
+    // EDIT THIS SECTION — everything a non-developer needs to update lives
+    // here. No other part of the file needs to change for routine updates.
+    // ======================================================================
+
+    // SHA-256 hash of the shared password (currently: wcteachertool).
+    // To change the password: use any online "SHA-256 hash generator",
+    // hash the new word, and paste the result here. Never put the plain
+    // password itself in this file.
+    var PASSWORD_HASH = '817045173e23545ef8d72baf5800079a796b53da6b8a0a1e199c161253941a35';
+
+    // Paste your existing "Suggest an App" Google Form link below.
+    var SUGGESTION_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfPPyZYnPicn778eGBmvwOtqndSK60_oSDeH0JeuGXs4zua1w/viewform';
+
+    // Bug-report form: leave blank until you've made one (same way you
+    // made the suggestion form). The card shows a "not set up yet" note
+    // until you paste a real link here.
+    var BUG_FORM_URL = '';
+
+    // Optional: a "view-only" link to the suggestions Google Sheet, so
+    // teachers can browse what's already been asked for. Leave blank to
+    // hide this card entirely. In Google Sheets: Share > "Anyone with the
+    // link" > Viewer, then paste that link here.
+    var SUGGESTIONS_SHEET_URL = '';
+
+    // Update these by hand whenever you add/remove an app on the hub.
+    var STATS = [
+      { value: '2', label: 'apps live' },
+      { value: 'Sep 2026', label: 'last updated' }
+    ];
+
+    // Roadmap — edit freely. status is one of: 'live', 'progress', 'considering'.
+    var ROADMAP = [
+      { status: 'live', text: 'Ruler Reading Practice' },
+      { status: 'live', text: 'Binary Number Game' },
+      { status: 'considering', text: 'Next app — based on teacher suggestions' }
+    ];
+
+    // ======================================================================
+    // Below this line is display logic — shouldn't need to be touched.
+    // ======================================================================
+
+    var pwInput = document.getElementById('pwInput');
+    var unlockButton = document.getElementById('unlockButton');
+    var gateError = document.getElementById('gateError');
+    var lockedView = document.getElementById('lockedView');
+    var unlockedView = document.getElementById('unlockedView');
+
+    async function sha256Hex(text) {
+      var bytes = new TextEncoder().encode(text);
+      var digest = await crypto.subtle.digest('SHA-256', bytes);
+      return Array.from(new Uint8Array(digest))
+        .map(function (b) { return b.toString(16).padStart(2, '0'); })
+        .join('');
+    }
+
+    async function tryUnlock() {
+      var value = pwInput.value.trim();
+      if (!value) return;
+
+      unlockButton.disabled = true;
+      var hash = await sha256Hex(value);
+      unlockButton.disabled = false;
+
+      if (hash === PASSWORD_HASH) {
+        gateError.textContent = '';
+        lockedView.style.display = 'none';
+        unlockedView.style.display = 'block';
+        renderContent();
+      } else {
+        gateError.textContent = "That password isn't right — try again.";
+        pwInput.value = '';
+        pwInput.focus();
+      }
+    }
+
+    function renderContent() {
+      // Suggestion form link
+      document.getElementById('suggestLink').href = SUGGESTION_FORM_URL;
+
+      // Bug report card
+      var bugLink = document.getElementById('bugLink');
+      var bugText = document.getElementById('bugText');
+      if (BUG_FORM_URL) {
+        bugLink.href = BUG_FORM_URL;
+        bugLink.className = 'btn';
+      } else {
+        bugText.textContent = "Not set up yet — create a form the same way as the suggestion form, then add its link in this page's settings.";
+        bugLink.className = 'btn disabled';
+        bugLink.removeAttribute('href');
+        bugLink.removeAttribute('target');
+      }
+
+      // Suggestions sheet card — hide entirely if no link configured
+      var sheetCard = document.getElementById('sheetCard');
+      if (SUGGESTIONS_SHEET_URL) {
+        document.getElementById('sheetLink').href = SUGGESTIONS_SHEET_URL;
+      } else {
+        sheetCard.style.display = 'none';
+      }
+
+      // Stats
+      var statsRow = document.getElementById('statsRow');
+      statsRow.innerHTML = STATS.map(function (s) {
+        return '<div class="stat"><b>' + s.value + '</b><span>' + s.label + '</span></div>';
+      }).join('');
+
+      // Roadmap
+      var roadmapList = document.getElementById('roadmapList');
+      roadmapList.innerHTML = ROADMAP.map(function (item) {
+        return '<li><span class="tag ' + item.status + '">' + item.status + '</span>' + item.text + '</li>';
+      }).join('');
+    }
+
+    unlockButton.addEventListener('click', tryUnlock);
+    pwInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') tryUnlock();
+    });
+  </script>
+</body>
+</html>
