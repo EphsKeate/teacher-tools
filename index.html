@@ -126,7 +126,7 @@
     <div id="unlockedView">
       <div class="card">
         <h2>Suggest an App</h2>
-        <p>Ideas for a new app or resource? This goes straight into a private form — nothing posted publicly.</p>
+        <p>Ideas for a new app or resource? This goes straight into a private form nothing posted publicly.</p>
         <a class="btn" id="suggestLink" href="#" target="_blank" rel="noopener">Open the form</a>
       </div>
 
@@ -156,47 +156,21 @@
   </main>
 
   <script>
-    // ======================================================================
-    // EDIT THIS SECTION — everything a non-developer needs to update lives
-    // here. No other part of the file needs to change for routine updates.
-    // ======================================================================
-
-    // SHA-256 hash of the shared password (currently: wcteachertool).
-    // To change the password: use any online "SHA-256 hash generator",
-    // hash the new word, and paste the result here. Never put the plain
-    // password itself in this file.
     var PASSWORD_HASH = '817045173e23545ef8d72baf5800079a796b53da6b8a0a1e199c161253941a35';
-
-    // Paste your existing "Suggest an App" Google Form link below.
     var SUGGESTION_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfPPyZYnPicn778eGBmvwOtqndSK60_oSDeH0JeuGXs4zua1w/viewform';
-
-    // Bug-report form: leave blank until you've made one (same way you
-    // made the suggestion form). The card shows a "not set up yet" note
-    // until you paste a real link here.
-    var BUG_FORM_URL = '';
-
-    // Optional: a "view-only" link to the suggestions Google Sheet, so
-    // teachers can browse what's already been asked for. Leave blank to
-    // hide this card entirely. In Google Sheets: Share > "Anyone with the
-    // link" > Viewer, then paste that link here.
+    var BUG_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSe_TWEsp1Rw12-pcFnmGj14Pg4SnRgaXTLFep-c2E7TceTA2w/viewform';
     var SUGGESTIONS_SHEET_URL = '';
 
-    // Update these by hand whenever you add/remove an app on the hub.
     var STATS = [
       { value: '2', label: 'apps live' },
       { value: 'Sep 2026', label: 'last updated' }
     ];
-
-    // Roadmap — edit freely. status is one of: 'live', 'progress', 'considering'.
     var ROADMAP = [
       { status: 'live', text: 'Ruler Reading Practice' },
       { status: 'live', text: 'Binary Number Game' },
       { status: 'considering', text: 'Next app — based on teacher suggestions' }
     ];
 
-    // ======================================================================
-    // Below this line is display logic — shouldn't need to be touched.
-    // ======================================================================
 
     var pwInput = document.getElementById('pwInput');
     var unlockButton = document.getElementById('unlockButton');
@@ -243,13 +217,11 @@
         bugLink.href = BUG_FORM_URL;
         bugLink.className = 'btn';
       } else {
-        bugText.textContent = "Not set up yet — create a form the same way as the suggestion form, then add its link in this page's settings.";
+        bugText.textContent = "Use this form to submit bugs and unintended problems with any tool.";
         bugLink.className = 'btn disabled';
         bugLink.removeAttribute('href');
         bugLink.removeAttribute('target');
       }
-
-      // Suggestions sheet card — hide entirely if no link configured
       var sheetCard = document.getElementById('sheetCard');
       if (SUGGESTIONS_SHEET_URL) {
         document.getElementById('sheetLink').href = SUGGESTIONS_SHEET_URL;
